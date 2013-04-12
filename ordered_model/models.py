@@ -5,11 +5,9 @@ from django.db import models
 def compact_order(manager):
     u"""Removes gaps between orders. [2,3,5,7] becomes: [0,1,2,3]."""
 
-    last = -1
-    for (pk, order) in manager.values_list('pk', 'order').order_by('order'):
-        if order - last > 1:
-            manager.filter(pk=pk).update(order=last + 1)
-        last += 1
+    for (idx, (pk, order)) in enumerate(manager.values_list('pk', 'order').order_by('order')):
+        if idx != order:
+            manager.filter(pk=pk).update(order=idx)
 
 class OrderedModel(models.Model):
     """
